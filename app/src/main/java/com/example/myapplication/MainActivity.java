@@ -36,19 +36,19 @@ public class MainActivity extends AppCompatActivity {
                         for (int i = 0; i < 10000; i++) {
                             MallocInit.testMalloc();
                         }
-                        Log.d(TAG, "test_time1=" + (System.currentTimeMillis() - b));
+                        Log.d(TAG, "test_time1 malloc " + (System.currentTimeMillis() - b));
                         b = System.currentTimeMillis();
                         for (int i = 0; i < 10000; i++) {
                             MallocInit.testMallocDebug();
                         }
-                        Log.d(TAG, "test_time2=" + (System.currentTimeMillis() - b));
+                        Log.d(TAG, "test_time2 malloc debug " + (System.currentTimeMillis() - b));
                         b = System.currentTimeMillis();
                         String space = new File(Environment.getExternalStorageDirectory(), "raphael").getAbsolutePath();
                         Raphael.start(Raphael.MAP64_MODE|Raphael.ALLOC_MODE|0x0F0000|1024, space, null);
                         for (int i = 0; i < 10000; i++) {
                             Raphael.testMallocRaphael();
                         }
-                        Log.d(TAG, "test_time3=" + (System.currentTimeMillis() - b));
+                        Log.d(TAG, "test_time3 Raphael " + (System.currentTimeMillis() - b));
                         File file = new File(dir, "malloc_printf.txt");
                         MallocInit.printf(file.getPath());
                     }
