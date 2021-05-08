@@ -32,9 +32,14 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         long b = System.currentTimeMillis();
                         for (int i = 0; i < 10000; i++) {
-                            MallocInit.test();
+                            MallocInit.testMalloc();
                         }
-                        Log.d(TAG, "test_time=" + (System.currentTimeMillis() - b));
+                        Log.d(TAG, "test_time1=" + (System.currentTimeMillis() - b));
+                        b = System.currentTimeMillis();
+                        for (int i = 0; i < 10000; i++) {
+                            MallocInit.testMallocDebug();
+                        }
+                        Log.d(TAG, "test_time2=" + (System.currentTimeMillis() - b));
                         File file = new File(dir, "malloc_printf.txt");
                         MallocInit.printf(file.getPath());
                     }

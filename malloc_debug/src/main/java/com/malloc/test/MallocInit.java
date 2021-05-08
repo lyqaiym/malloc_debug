@@ -14,7 +14,9 @@ public class MallocInit {
 
     private static native void init(String file);
 
-    public static native void test();
+    public static native void testMalloc();
+
+    public static native void testMallocDebug();
 
     public static native void printf(String file);
 }
