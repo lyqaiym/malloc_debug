@@ -3,9 +3,11 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
+import com.bytedance.raphael.Raphael;
 import com.malloc.test.MallocInit;
 
 import java.io.File;
@@ -40,10 +42,23 @@ public class MainActivity extends AppCompatActivity {
                             MallocInit.testMallocDebug();
                         }
                         Log.d(TAG, "test_time2=" + (System.currentTimeMillis() - b));
+                        b = System.currentTimeMillis();
+                        String space = new File(Environment.getExternalStorageDirectory(), "raphael").getAbsolutePath();
+                        Raphael.start(Raphael.MAP64_MODE|Raphael.ALLOC_MODE|0x0F0000|1024, space, null);
+                        for (int i = 0; i < 10000; i++) {
+                            Raphael.testMallocRaphael();
+                        }
+                        Log.d(TAG, "test_time3=" + (System.currentTimeMillis() - b));
                         File file = new File(dir, "malloc_printf.txt");
                         MallocInit.printf(file.getPath());
                     }
                 }.start();
+            }
+        });
+        findViewById(R.id.bt2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Raphael.print();
             }
         });
     }
