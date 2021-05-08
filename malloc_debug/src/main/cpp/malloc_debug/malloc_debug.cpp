@@ -58,6 +58,7 @@
 #include "malloc_debug.h"
 #include "UnwindBacktrace.h"
 #include "ReadFileToString.h"
+#include <jni.h>
 
 #define TAG "malloc_debug_cpp"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
@@ -994,4 +995,88 @@ void debug_dump_heap(const char* file_name) {
   error_log("Dumping to file: %s\n", file_name);
   write_dump(fp);
   fclose(fp);
+}
+
+bool debuginit;
+const char *save;
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_malloc_test_MallocInit_init(JNIEnv *env, jclass clazz,jstring path) {
+  struct MallocDispatch *malloc_dispatch = static_cast<MallocDispatch *>(malloc(
+          sizeof(struct MallocDispatch)));
+
+  malloc_dispatch->calloc = &calloc;
+  malloc_dispatch->free = &free;
+  malloc_dispatch->malloc = &malloc;
+  malloc_dispatch->realloc = &realloc;
+  LOGD("debug_initialize:realloc=%p,%p", malloc_dispatch->realloc, &realloc);
+  malloc_dispatch->memalign = &memalign;
+  malloc_dispatch->posix_memalign = &posix_memalign;
+  malloc_dispatch->malloc_usable_size = &malloc_usable_size;
+//    malloc_dispatchmy->aligned_alloc = &aligned_alloc;
+
+//    memcpy(malloc_dispatch,malloc_dispatchmy,sizeof(struct MallocDispatchMy));
+//    memset(malloc_dispatch,0,sizeof(struct MallocDispatchMy));
+//    malloc_dispatch->malloc = &malloc;
+  bool zygote_child = true;
+  char *options = static_cast<char *>(malloc(100));
+//    sprintf(options, "libc.debug.malloc.options %s", "backtrace");
+//    sprintf(options, "LIBC_DEBUG_MALLOC_OPTIONS=%s", "backtrace");
+//    sprintf(options, "LIBC_DEBUG_MALLOC_OPTIONS %s", "backtrace");
+//    sprintf(options, "libc.debug.malloc.options=%s", "1");
+//    sprintf(options, "libc.debug.malloc.options=%d", 1);
+//    sprintf(options, "libc.debug.malloc.env_enabled %s", "1");
+//    sprintf(options, "libc.debug.malloc.program %s", "1");
+//    sprintf(options, "%s", "backtrace");
+  sprintf(options, "%s", "leak_track backtrace backtrace_full record_allocs");
+//    sprintf(options, "%s", "verbose");
+//    sprintf(options, "libc.debug.malloc %d", 1);
+//    sprintf(options, "libc.debug.malloc %d", 1);
+//    sprintf(options, "%s", "backtrace=4 backtrace_dump_on_exit");
+  options[84] = '\0';
+  LOGD("debug_initialize:options=%s", options);
+  debuginit = debug_initialize(malloc_dispatch, &zygote_child, options);
+  LOGD("debug_initialize:debuginit=%d", debuginit);
+  if (debuginit) {
+    save = env->GetStringUTFChars(path, nullptr);
+  }
+}
+
+void test4(){
+    void* p = debug_malloc(11);
+//    debug_free(p);
+}
+
+void test3(){
+    test4();
+}
+
+void test2(){
+    test3();
+}
+
+void test1(){
+    test2();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_malloc_test_MallocInit_test(JNIEnv *env, jclass clazz) {
+    test1();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_malloc_test_MallocInit_printf(JNIEnv *env, jclass clazz,jstring path) {
+    uint8_t *info = 0;
+    size_t overall_size;
+    size_t info_size;
+    size_t total_memory;
+    size_t backtrace_size;
+    debug_get_malloc_leak_info(&info, &overall_size, &info_size, &total_memory, &backtrace_size);
+    LOGD("MallocInit_stop:info=%p", &info);
+    const char *c = env->GetStringUTFChars(path, nullptr);
+    LOGD("MallocInit_stop:c=%s", c);
+    debug_dump_heap(c);
+//    extralogLeaks(1);
 }
