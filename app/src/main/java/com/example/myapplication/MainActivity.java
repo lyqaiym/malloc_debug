@@ -32,13 +32,14 @@ public class MainActivity extends AppCompatActivity {
                 new Thread() {
                     @Override
                     public void run() {
+                        int size = 10000;
                         long b = System.currentTimeMillis();
-                        for (int i = 0; i < 10000; i++) {
+                        for (int i = 0; i < size; i++) {
                             MallocInit.testMalloc();
                         }
                         Log.d(TAG, "test_time1 malloc " + (System.currentTimeMillis() - b));
                         b = System.currentTimeMillis();
-                        for (int i = 0; i < 10000; i++) {
+                        for (int i = 0; i < size; i++) {
                             MallocInit.testMallocDebug();
                         }
                         Log.d(TAG, "test_time2 malloc debug " + (System.currentTimeMillis() - b));
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
                         String space = new File(getExternalCacheDir(), "raphael").getAbsolutePath();
                         Raphael.start(Raphael.MAP64_MODE|Raphael.ALLOC_MODE|0x0F0000|1024, space, null);
-                        for (int i = 0; i < 10000; i++) {
+                        for (int i = 0; i < size; i++) {
                             MallocInit.testMalloc();
                         }
                         Log.d(TAG, "test_time3 Raphael " + (System.currentTimeMillis() - b));

@@ -1045,10 +1045,10 @@ Java_com_malloc_test_MallocInit_init(JNIEnv *env, jclass clazz,jstring path) {
 void test4(int debug){
   if(debug){
     void* p = debug_malloc(111111);
-//    debug_free(p);
+    debug_free(p);
   }else{
     void* p = malloc(111111);
-//    free(p);
+    free(p);
   }
 }
 
