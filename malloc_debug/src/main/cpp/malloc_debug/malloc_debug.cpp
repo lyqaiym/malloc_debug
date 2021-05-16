@@ -1042,38 +1042,36 @@ Java_com_malloc_test_MallocInit_init(JNIEnv *env, jclass clazz,jstring path) {
   }
 }
 
-void test4(int debug){
-  if(debug){
-    void* p = debug_malloc(111111);
-    debug_free(p);
-  }else{
-    void* p = malloc(111111);
-    free(p);
-  }
+void test4(int type){
+    if(type==0){
+        void* p = malloc(11128000);
+//        LOGD("test4:p=%p", p);
+        free(p);
+    }else if(type==1){
+       void* p = debug_malloc(11128000);
+       debug_free(p);
+    }else if(type==2){
+       void* p = g_dispatch->malloc(11128000);
+       g_dispatch->free(p);
+    }
 }
 
-void test3(int debug){
-    test4(debug);
+void test3(int type){
+    test4(type);
 }
 
-void test2(int debug){
-    test3(debug);
+void test2(int type){
+    test3(type);
 }
 
-void test1(int debug){
-    test2(debug);
+void test1(int type){
+    test2(type);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_malloc_test_MallocInit_testMalloc(JNIEnv *env, jclass clazz) {
-  test1(0);
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_malloc_test_MallocInit_testMallocDebug(JNIEnv *env, jclass clazz) {
-    test1(1);
+Java_com_malloc_test_MallocInit_testMalloc(JNIEnv *env, jclass clazz,jint type) {
+  test1(type);
 }
 
 extern "C"

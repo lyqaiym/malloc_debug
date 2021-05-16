@@ -26,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
         }
         File file = new File(dir, "malloc_init.txt");
         MallocInit.javaInit(file);
+
+        String space = new File(getExternalCacheDir(), "raphael").getAbsolutePath();
+        Raphael.start(Raphael.MAP64_MODE|Raphael.ALLOC_MODE|0x0F0000|1024, space, null);
+
         findViewById(R.id.bt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -35,22 +39,19 @@ public class MainActivity extends AppCompatActivity {
                         int size = 10000;
                         long b = System.currentTimeMillis();
                         for (int i = 0; i < size; i++) {
-                            MallocInit.testMalloc();
+                            MallocInit.testMalloc(2);
                         }
-                        Log.d(TAG, "test_time1 malloc " + (System.currentTimeMillis() - b));
+                        Log.d(TAG, "test_time3 Raphael_2 " + (System.currentTimeMillis() - b));
                         b = System.currentTimeMillis();
                         for (int i = 0; i < size; i++) {
-                            MallocInit.testMallocDebug();
+                            MallocInit.testMalloc(1);
                         }
-                        Log.d(TAG, "test_time2 malloc debug " + (System.currentTimeMillis() - b));
+                        Log.d(TAG, "test_time4 Raphael_1 " + (System.currentTimeMillis() - b));
                         b = System.currentTimeMillis();
-
-                        String space = new File(getExternalCacheDir(), "raphael").getAbsolutePath();
-                        Raphael.start(Raphael.MAP64_MODE|Raphael.ALLOC_MODE|0x0F0000|1024, space, null);
                         for (int i = 0; i < size; i++) {
-                            MallocInit.testMalloc();
+                            MallocInit.testMalloc(0);
                         }
-                        Log.d(TAG, "test_time3 Raphael " + (System.currentTimeMillis() - b));
+                        Log.d(TAG, "test_time5 Raphael_0 " + (System.currentTimeMillis() - b));
                         File file = new File(dir, "malloc_printf.txt");
                         MallocInit.printf(file.getPath());
                     }
